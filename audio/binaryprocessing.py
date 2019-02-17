@@ -17,28 +17,23 @@ def int2bytes(i):
     hex_string = '%x' % i
     n = len(hex_string)
     return binascii.unhexlify(hex_string.zfill(n + (n & 1)))
-'''
-def text_to_bits(text, encoding='utf-8', errors='surrogatepass'):
-    bits = bin(int.from_bytes(text.encode(encoding, errors), 'big'))[2:]
-    return bits.zfill(8 * ((len(bits) + 7) // 8))
-
-def text_from_bits(bits, encoding='utf-8', errors='surrogatepass'):
-    n = int(bits, 2)
-    return n.to_bytes((n.bit_length() + 7) // 8, 'big').decode(encoding, errors) or '\0'
-'''
 
 offset = 100
-ltr = "makanan enak!"
+acak_sign = "ak"
+seq_sign = "sk"
+ltr = ""
+ltr = ltr + "makanan enak!"
 #bin_ltr = ''.join(format(ord(x), 'b') for x in st)
-bin_ltr = text_to_bits(ltr)
+bin_ltr = text_to_bits(seq_sign) + "00000011" + text_to_bits(ltr)
+bin_ltr = bin_ltr + "00000011"
 
 print(bin_ltr)
 
 # Pass "wb" to write a new file, or "ab" to append
-with open("makan.wav", "wb") as binary_file:
+with open("wav/makan.wav", "wb") as binary_file:
 
     # Pass "wb" to write a new file, or "ab" to append
-    with open("cat-purr.wav", "rb") as wav_file:
+    with open("wav/cat-purr.wav", "rb") as wav_file:
         # Write text or bytes to the file
         data = bytearray(wav_file.read())
         for i in range(0,len(bin_ltr)):
