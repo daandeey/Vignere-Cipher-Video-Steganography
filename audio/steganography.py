@@ -45,24 +45,24 @@ def embed(infile, outfile, sign, message):
                 starting_point = offset+(len(acak_sign)+len(str(seeder)))*8+2*len(delimiter)
                 seq = generateIndexRandom(message, seeder, starting_point, len(data))
 
+            if (sign==acak_sign):
                 bin_ltr = bin.text_to_bits(acak_sign) + delimiter
                 bin_ltr = bin_ltr + bin.text_to_bits(str(seeder)) + delimiter
-                bin_ltr = bin_ltr + bin.text_to_bits(ltr) + delimiter
+            else:
+                bin_ltr = bin.text_to_bits(seq_sign) + delimiter
+            bin_ltr = bin_ltr + bin.text_to_bits(ltr) + delimiter
 
-                if (sign==acak_sign):
-                    for i in range(offset, starting_point):
-                        data[i] = bin.setLSB(data[i], int(bin_ltr[i-offset]))
-                    
-                    for i in range(0,len(seq)):
-                        data[seq[i]] = bin.setLSB(data[seq[i]], int(bin_ltr[starting_point-offset+i]))
-                    
-                else:
-                    for i in range(0,len(bin_ltr)):
-                        if (sign==acak_sign):
-                            idx = offset+seq[i]
-                        else:
-                            idx = offset+i
-                        data[idx] = (data[idx] & ~1) | int(bin_ltr[i])
+            if (sign==acak_sign):
+                for i in range(offset, starting_point):
+                    data[i] = bin.setLSB(data[i], int(bin_ltr[i-offset]))
+                
+                for i in range(0,len(seq)):
+                    data[seq[i]] = bin.setLSB(data[seq[i]], int(bin_ltr[starting_point-offset+i]))
+                
+            else:
+                for i in range(0,len(bin_ltr)):
+                    idx = offset+i
+                    data[idx] = bin.setLSB(data[idx], int(bin_ltr[i])) 
 
             binary_file.write(data)
 
@@ -78,7 +78,6 @@ def extract(filename):
         data = bytearray(wav_file.read())
         for k in range(16,24):    
             sign = sign + str(data[offset+k] & 1)
-        #print(sign)
 
         if (sign == delimiter):
             sign = ""
@@ -95,13 +94,10 @@ def extract(filename):
                 if ((i-7)%8==0 and i!=start):
                     idx_start = i-7-start 
                     idx_end = i+1-start
-                    print(ltr[idx_start:idx_end])
-                    print(bin.text_from_bits(ltr[idx_start:idx_end]))
                     if (ltr[idx_start:idx_end]==delimiter):
                         found = True
                 i = i + 1
-                if (i == 5000):
-                    break
+            return bin.text_from_bits(ltr[0:len(ltr)-8])
         else:
             idx = len(acak_sign)*8+len(delimiter)+offset
             count = 1

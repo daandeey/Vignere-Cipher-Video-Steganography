@@ -1,6 +1,6 @@
 from audio import steganography as aud
 
-print("=====================")
+print("========================================")
 print("Aplikasi Steganografi")
 print("1: Penyisipan pesan")
 print("2: Ekstraksi pesan")
@@ -41,6 +41,16 @@ if (choice=="1"):
             print("Simpan hasil ke file: ", end='')
             out = input()
             aud.embed(fileaudio, out, aud.acak_sign, pesan)
+            print("Penyisipan pesan berhasil!!!")
+            print("Mainkan hasil steganografi? (y/n): ")
+            print(aud.extract(out))
+        elif (choice=="2"):
+            print("========================================")
+            print("Penyisipan pesan ke audio secara terurut")
+            print("Apakah perlu dienkripsi? (y/n): ")
+            print("Simpan hasil ke file: ", end='')
+            out = input()
+            aud.embed(fileaudio, out, aud.seq_sign, pesan)
             print("Penyisipan pesan berhasil!!!")
             print("Mainkan hasil steganografi? (y/n): ")
             print(aud.extract(out))
