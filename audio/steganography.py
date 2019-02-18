@@ -1,4 +1,5 @@
 from . import binary as bin
+from cipher import cipher as cp
 
 import binascii
 import random
@@ -6,6 +7,8 @@ import random
 offset = 100
 acak_sign = "ak"
 seq_sign = "sk"
+acak_enc = "ae"
+seq_enc = "se"
 delimiter = "00000011"
 seeder_limit = 1000000
 directory = "wav/"
@@ -14,9 +17,9 @@ def generateIndexRandom(message, seeder, start, limit):
     
     index_list = []
     random.seed(seeder)
-    for c in message:
-        for k in range(0, 8):
-            index_list.append(random.randint(start, limit))
+    for c in bin.text_to_bits(message):
+        #for k in range(0, 8):
+        index_list.append(random.randint(start, limit))
 
     for k in range(0, 8):
         index_list.append(random.randint(start, limit))
@@ -37,22 +40,28 @@ def embed(infile, outfile, sign, message):
         with open(directory+infile, "rb") as wav_file:
             # Write text or bytes to the file
             data = bytearray(wav_file.read())
-            if (sign==acak_sign):
+            if (sign==acak_sign or sign==acak_enc):
                 seeder = 0
                 for c in message:
                     seeder = (seeder + ord(c))%seeder_limit
 
                 starting_point = offset+(len(acak_sign)+len(str(seeder)))*8+2*len(delimiter)
                 seq = generateIndexRandom(message, seeder, starting_point, len(data))
-
-            if (sign==acak_sign):
-                bin_ltr = bin.text_to_bits(acak_sign) + delimiter
+                
+            if (sign==acak_sign or sign==acak_enc):
+                if (acak_enc):
+                    bin_ltr = bin.text_to_bits(acak_enc) + delimiter
+                else:
+                    bin_ltr = bin.text_to_bits(acak_sign) + delimiter
                 bin_ltr = bin_ltr + bin.text_to_bits(str(seeder)) + delimiter
             else:
-                bin_ltr = bin.text_to_bits(seq_sign) + delimiter
+                if (sign==seq_sign):
+                    bin_ltr = bin.text_to_bits(seq_sign) + delimiter
+                else:
+                    bin_ltr = bin.text_to_bits(seq_enc) + delimiter
             bin_ltr = bin_ltr + bin.text_to_bits(ltr) + delimiter
 
-            if (sign==acak_sign):
+            if (sign==acak_sign or sign==acak_enc):
                 for i in range(offset, starting_point):
                     data[i] = bin.setLSB(data[i], int(bin_ltr[i-offset]))
                 
@@ -66,7 +75,7 @@ def embed(infile, outfile, sign, message):
 
             binary_file.write(data)
 
-def extract(filename):
+def extract(filename, key):
 
     found = False
     ltr = ""
@@ -85,7 +94,7 @@ def extract(filename):
                 sign = sign + str(data[offset+k] & 1)
             sign = bin.text_from_bits(sign)
         
-        if (sign == seq_sign):
+        if (sign == seq_sign or sign == seq_enc):
             start = (len(seq_sign)+1)*8
             i = start
             while not found:
@@ -97,7 +106,10 @@ def extract(filename):
                     if (ltr[idx_start:idx_end]==delimiter):
                         found = True
                 i = i + 1
-            return bin.text_from_bits(ltr[0:len(ltr)-8])
+            hasil = bin.text_from_bits(ltr[0:len(ltr)-8])
+            if (sign==seq_enc):
+                hasil = cp.VigenereCipherExtendedDecrypt(key, hasil)
+            return hasil
         else:
             idx = len(acak_sign)*8+len(delimiter)+offset
             count = 1
@@ -133,5 +145,12 @@ def extract(filename):
                         found = True
                     turn = turn + 1
                 count = count + 1
-            return bin.text_from_bits(message[0:8*(turn-1)])
+            #
+            hasil = bin.text_from_bits(message[0:8*(turn-1)])
+            #print(sign)
+            if (sign == acak_enc):
+                #print(sign)
+                hasil = cp.VigenereCipherExtendedDecrypt(key, hasil) 
+            return hasil
+
             

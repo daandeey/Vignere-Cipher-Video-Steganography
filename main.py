@@ -1,4 +1,6 @@
 from audio import steganography as aud
+from audio import binary as bin
+from cipher import cipher as cp
 
 print("========================================")
 print("Aplikasi Steganografi")
@@ -36,48 +38,59 @@ if (choice=="1"):
 
         if (choice=="3"):
             print("========================================")
-            print("Penyisipan pesan ke audio terurut")
-            print("Apakah perlu dienkripsi? (y/n): ")
+            print("Penyisipan pesan ke audio secara acak")
+            print("Apakah perlu dienkripsi? (y/n): ", end='')
+            choice = input()
+            if (choice=='y'):
+                print("Masukkan kunci: ", end='')
+                key = input()
+                pesan = cp.VigenereCipherExtendedEncrypt(key, pesan)
             print("Simpan hasil ke file: ", end='')
             out = input()
             aud.embed(fileaudio, out, aud.acak_sign, pesan)
             print("Penyisipan pesan berhasil!!!")
             print("Mainkan hasil steganografi? (y/n): ")
-            print(aud.extract(out))
+            print(aud.extract(out, key))
         elif (choice=="2"):
             print("========================================")
-            print("Penyisipan pesan ke audio secara terurut")
-            print("Apakah perlu dienkripsi? (y/n): ")
+            print("Penyisipan pesan ke audio terurut")
+            print("Apakah perlu dienkripsi? (y/n): ", end='')
+            choice = input()
+            sign = aud.seq_sign
+            if (choice=='y'):
+                sign = aud.seq_enc
+                print("Masukkan kunci: ", end='')
+                key = input()
+                pesan = cp.VigenereCipherExtendedEncrypt(key, pesan)  
             print("Simpan hasil ke file: ", end='')
             out = input()
-            aud.embed(fileaudio, out, aud.seq_sign, pesan)
+            aud.embed(fileaudio, out, sign, pesan)
             print("Penyisipan pesan berhasil!!!")
             print("Mainkan hasil steganografi? (y/n): ")
-            print(aud.extract(out))
+            print(aud.extract(out, key))
 
     elif (choice=="2"):
         print()
 
 elif (choice=="2"):
-    print("hello!")
-'''
-
-print("Masukkan kunci: ")
-print("Masukkan file eksternal: ")
-print("Simpan file audio dengan nama:")
-print("Audio hasil sisipan pesan berhasil dibuat")
-print("Mainkan hasil file audio? (y/n)")
-
-print("Ekstraksi Pesan")
-print("1: Audio")
-print("2: Video")
-print("3: Kembali")
-print("Pilih (1/2/3): ")
-
-print("File audio: ")
-print("1: Mainkan file audio")
-print("2: Ekstraksi pesan ke file eksternal")
-print("3: Ekstraksi pesan langsung")
-print("4: Kembali")
-print("Pilih (1/2/3/4): ")
-'''
+    print("Catatan: audio diambil dari folder wav")
+    print("Masukkan file audio: ", end='')
+    fileaudio = input()
+    print("File audio: ", fileaudio)
+    print("1: Mainkan file audio")
+    print("2: Ekstraksi pesan ke file eksternal")
+    print("3: Ekstraksi pesan langsung")
+    print("4: Kembali")
+    print("Pilih (1/2/3/4): ", end='')
+    choice = input()
+    
+    if (choice=="3"):
+        print("Apakah memerlukan kunci? (y/n): ", end='')
+        choice = input()
+        key = ""
+        if (choice=="y"):
+            print("Masukkan kunci: ", end='')
+            key = input()
+        hasil = aud.extract(fileaudio, key)
+        print("Ekstraksi pesan berhasil!!!")
+        print(hasil)
