@@ -2,23 +2,21 @@ from . import binary as bin
 import cv2
 import numpy as np
 
-offset = 100
+# constants
+CARRIER_DIR = "avi/"
 FRAMES_DIR = "temp/"
 FRAME_RANDOM_SIGN = "fr"
 FRAME_SEQ_SIGN = "fs"
 PIXEL_RANDOM_SIGN = "pr"
 PIXEL_SEQ_SIGN = "ps"
-delimiter = "00000011"
-seeder_limit = 1000000
-DIR = "avi/"
 
-def audio_extract(video):
+def audio_extract(file_name):
     # audio is extracted using system call
     # ffmpeg -i data/chef.mp4 -q:a 0 -map a temp/audio.mp3 -y
     # 2>/dev/null for supressing the output from ffmpeg
-    call(["ffmpeg", "-i", "data/" + str(video), "-q:a", "0", "-map", "a", "temp/audio.mp3", "-y"],stdout=open(os.devnull, "w"), stderr=STDOUT)
+    call(["ffmpeg", "-i", "data/" + str(file_name), "-q:a", "0", "-map", "a", "temp/audio.mp3", "-y"],stdout=open(os.devnull, "w"), stderr=STDOUT)
 
-def merge_audio_and_frames(audio, file_name):
+def merge_audio_and_frames(file_name):
     # audio and video are merged using system call
     # ffmpeg -i temp/%d.png -vcodec png data/video.mov
     call(["ffmpeg", "-i", "temp/%d.png" , "-vcodec", "png", "temp/video.mov", "-y"],stdout=open(os.devnull, "w"), stderr=STDOUT)
@@ -26,7 +24,10 @@ def merge_audio_and_frames(audio, file_name):
     call(["ffmpeg", "-i", "temp/video.mov", "-i", "temp/audio.mp3", "-codec", "copy","data/enc-" + str(file_name)+".avi", "-y"],stdout=open(os.devnull, "w"), stderr=STDOUT)
        
 
-def frame_extract(video):
+def frame_extract(file_name):
+    # frame_extract is to extract file in 'CARRIER_DIR/file_name' into frames
+    # frames saved in 'FRAMES_DIR'
+    
     temp_folder = 'temp'
     try:
         os.mkdir(temp_folder)
@@ -34,7 +35,7 @@ def frame_extract(video):
         remove(temp_folder)
         os.mkdir(temp_folder)
 
-    vidcap = cv2.VideoCapture("data/"+str(video))
+    vidcap = cv2.VideoCapture("data/"+str(file_name))
     count = 0
 
     while True:
@@ -111,36 +112,30 @@ def encode_frame_random(dir, file, opt):
                 random_image_LSB(frame, chopped_file)
     #frames are inserted with file
     
+def encode(infile, outfile, frame_mode, pixel_mode, file_to_be_hide):
+    # infile is name of the input video file
+    # outfile is name of the output video file
+    # frame_mode is mode that how the frame gonna be steg; sequential or random
+    # pixel_mode is mode that how the pixel gonna be steg; sequential or random
+    # file_to_be_hide is name of the file that wanna be hide
 
+    frame_extract(infile)
+    audio_extract(infile)
+    frames_dir = FRAMES_DIR
 
-
-def embed(infile, outfile, frame_mode, pixel_mode, file_to_be_hide):
-
-    ltr = ""
-    ltr = ltr + message
-    bin_ltr = ""
-    seq = None
-
-    # Pass "wb" to write a new file, or "ab" to append
-    with open(directory+outfile, "wb") as output_file:
-
-        # Pass "rb" to read file, or "ab" to append
-        with open(directory+infile, "rb") as input_file:
-            #infile is the video file in data folder
-            frame_extract(infile)
-            frames_dir = FRAMES_DIR
-
-            if (frame_mode == FRAME_SEQ_SIGN):
-                if (pixel_mode == PIXEL_SEQ_SIGN):
-                    encode_frame_sequential(frames_dir, file_to_be_hide, 'seq')
-                
-                else:
-                    encode_frame_sequential(frames_dir, file_to_be_hide, 'ran')
-            else:
-                if (pixel_mode == PIXEL_SEQ_SIGN):
-                    encode_frame_random(frames_dir, file_to_be_hide, 'seq')
-    
-                else:
-                    encode_frame_random(frames_dir, file_to_be_hide, 'ran')
-
+    if (frame_mode == FRAME_SEQ_SIGN):
+        if (pixel_mode == PIXEL_SEQ_SIGN):
+            encode_frame_sequential(frames_dir, file_to_be_hide, 'seq')
         
+        else:
+            encode_frame_sequential(frames_dir, file_to_be_hide, 'ran')
+    else:
+        if (pixel_mode == PIXEL_SEQ_SIGN):
+            encode_frame_random(frames_dir, file_to_be_hide, 'seq')
+
+        else:
+            encode_frame_random(frames_dir, file_to_be_hide, 'ran')
+
+    merge_audio_and_frames(infile)        
+
+def decode(infile):
