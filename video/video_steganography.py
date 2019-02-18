@@ -45,6 +45,55 @@ def split2len(s, n):
             s = s[n:]
     return list(_f(s, n))
 
+def is_file_fit(carrier, file_to_be_hide):
+    #is_file_fit return true if carrier can carry the file_to_be_hide
+
+def sequential_image_LSB(img, file):
+    #img is the image file
+    #file is the file that want to be hide
+
+def random_image_LSB(img, file):
+    #img is the image file
+    #file is the file that want to be hide
+
+def encode_frame_sequential(dir, file, opt):
+    #dir is the frames directory
+    #file is the file that want to be hide
+    #opt is option, 'seq' for sequential, 'ran' for random 
+    
+    file_ext = 'txt'
+    file_size = 1000
+
+    #insert file_ext to frame
+    
+    #insert file_size to frame 
+    
+    #insert file to frame
+
+    for chopped_file in file:
+        for frame in frames:
+            if (opt == 'seq'):
+                sequential_image_LSB(frame, chopped_file)
+            else:
+                random_image_LSB(frame, chopped_file)
+    #frames are inserted with file
+    
+def encode_frame_random(dir, file, opt):
+    #dir is the frames directory
+    #file is the file that want to be hide
+    #opt is option, 'seq' for sequential, 'ran' for random 
+
+    for chopped_file in file:
+        for frame in frames:
+            if (opt == 'seq'):
+                sequential_image_LSB(frame, chopped_file)
+            else:
+                random_image_LSB(frame, chopped_file)
+    #frames are inserted with file
+    
+
+
+
 def embed(infile, outfile, frame_mode, pixel_mode, message):
 
     ltr = ""
