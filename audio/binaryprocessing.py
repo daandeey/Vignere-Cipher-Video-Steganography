@@ -4,6 +4,7 @@ Bit Manipulation
 2) Bin & 1: Mendapatkan nilai LSB
 '''
 import binascii
+import random
 
 def text_to_bits(text, encoding='utf-8', errors='surrogatepass'):
     bits = bin(int(binascii.hexlify(text.encode(encoding, errors)), 16))[2:]
@@ -19,15 +20,34 @@ def int2bytes(i):
     return binascii.unhexlify(hex_string.zfill(n + (n & 1)))
 
 offset = 100
+
+def setLSB(data, binary):
+    return (data & ~1) | binary
+
+def generateIndexRandom(message, seeder, start, limit):
+    
+    index_list = []
+    random.seed(seeder)
+    for c in message:
+        for k in range(0, 8):
+            index_list.append(random.randint(start, limit))
+
+    for k in range(0, 8):
+        index_list.append(random.randint(start, limit))
+    
+    return index_list
+
 acak_sign = "ak"
 seq_sign = "sk"
 ltr = ""
-ltr = ltr + "makanan enak!"
+sign = acak_sign
+message = "poster nih;(!"
+delimiter = "00000011"
+ltr = ltr + message
+bin_ltr = ""
+seq = None
+seeder_limit = 1000000
 #bin_ltr = ''.join(format(ord(x), 'b') for x in st)
-bin_ltr = text_to_bits(seq_sign) + "00000011" + text_to_bits(ltr)
-bin_ltr = bin_ltr + "00000011"
-
-print(bin_ltr)
 
 # Pass "wb" to write a new file, or "ab" to append
 with open("wav/makan.wav", "wb") as binary_file:
@@ -36,6 +56,43 @@ with open("wav/makan.wav", "wb") as binary_file:
     with open("wav/cat-purr.wav", "rb") as wav_file:
         # Write text or bytes to the file
         data = bytearray(wav_file.read())
-        for i in range(0,len(bin_ltr)):
-            data[offset+i] = (data[offset+i] & ~1) | int(bin_ltr[i])
+        if (sign==acak_sign):
+            print("penyisipan acak")
+            seeder = 0
+            for c in message:
+                seeder = (seeder + ord(c))%seeder_limit
+
+            starting_point = offset+(len(acak_sign)+len(str(seeder)))*8+2*len(delimiter)
+            seq = generateIndexRandom(message, seeder, starting_point, len(data))
+
+            bin_ltr = text_to_bits(acak_sign) + delimiter
+            bin_ltr = bin_ltr + text_to_bits(str(seeder)) + delimiter
+            bin_ltr = bin_ltr + text_to_bits(ltr) + delimiter
+
+            if (sign==acak_sign):
+                for i in range(offset, starting_point):
+                    data[i] = setLSB(data[i], int(bin_ltr[i-offset]))
+                
+                #print("hasil sisipan")
+                #print(len(text_to_bits(str(seeder)))+8)
+                #for i in range(0,len(text_to_bits(str(seeder)))+8):
+                    #print(i+24+offset)
+                    #print(data[i+24+offset] & 1)
+                for i in range(0,len(seq)):
+                    data[seq[i]] = setLSB(data[seq[i]], int(bin_ltr[starting_point-offset+i]))
+                
+            else:
+                 for i in range(0,len(bin_ltr)):
+                    if (sign==acak_sign):
+                        idx = offset+seq[i]
+                    else:
+                        idx = offset+i
+                    data[idx] = (data[idx] & ~1) | int(bin_ltr[i])
+
+            #print(seeder)
+            #print(text_to_bits(str(seeder)))
+            #print("\n")
+            #print(bin_ltr[24:24+len(text_to_bits(str(seeder)))+8])
         binary_file.write(data)
+        #print(seq)
+        #print(seeder)
