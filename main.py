@@ -2,6 +2,8 @@ from audio import steganography as aud
 from audio import binary as bin
 from cipher import cipher as cp
 
+directory = "text/"
+
 print("========================================")
 print("Aplikasi Steganografi")
 print("1: Penyisipan pesan")
@@ -19,16 +21,19 @@ if (choice=="1"):
     choice = input()
     if (choice=="1"):
         print("Catatan: audio diambil dari folder wav")
-        #print("Catatan: pesan diambil dari folder in")
+        print("Catatan: pesan diambil dari folder text")
         print("Masukkan file audio: ", end='')
         fileaudio = input()
-        print("Masukkan pesan: ", end='')
-        pesan = input()
-        #filepesan = input()
+        print("Masukkan file pesan: ", end='')
+        filepesan = input()
+
+        pesan = None
+        with open(directory+filepesan, "rb") as wav_file:
+            pesan = bytes(wav_file.read()).decode("utf-8") 
 
         print("========================================")
         print("File audio: ", fileaudio)
-        print("Pesan: ", pesan)
+        print("File pesan: ", pesan)
         print("1: Mainkan file audio")
         print("2: Penyisipan pesan terurut")
         print("3: Penyisipan pesan secara acak")
@@ -41,6 +46,7 @@ if (choice=="1"):
             print("Penyisipan pesan ke audio secara acak")
             print("Apakah perlu dienkripsi? (y/n): ", end='')
             choice = input()
+            key = None
             if (choice=='y'):
                 print("Masukkan kunci: ", end='')
                 key = input()
@@ -57,11 +63,12 @@ if (choice=="1"):
             print("Apakah perlu dienkripsi? (y/n): ", end='')
             choice = input()
             sign = aud.seq_sign
+            key = None
             if (choice=='y'):
                 sign = aud.seq_enc
                 print("Masukkan kunci: ", end='')
                 key = input()
-                pesan = cp.VigenereCipherExtendedEncrypt(key, pesan)  
+                pesan = cp.VigenereCipherExtendedEncrypt(key, pesan)
             print("Simpan hasil ke file: ", end='')
             out = input()
             aud.embed(fileaudio, out, sign, pesan)

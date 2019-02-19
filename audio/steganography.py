@@ -59,6 +59,7 @@ def embed(infile, outfile, sign, message):
                     bin_ltr = bin.text_to_bits(seq_sign) + delimiter
                 else:
                     bin_ltr = bin.text_to_bits(seq_enc) + delimiter
+            #print(ltr)
             bin_ltr = bin_ltr + bin.text_to_bits(ltr) + delimiter
 
             if (sign==acak_sign or sign==acak_enc):
