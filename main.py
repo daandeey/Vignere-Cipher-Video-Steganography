@@ -204,7 +204,7 @@ if __name__ == "__main__":
                         writing.close() 
                         print("Ekstraksi pesan berhasil disimpan di "+filepesan+"!!!")
                 
-                if (choice=="4"):
+                if (choice=="5"):
                     finished = True
             finished = False
         elif (choice=="3"):
