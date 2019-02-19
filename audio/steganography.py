@@ -47,48 +47,57 @@ def embed(infile, outfile, sign, message, key):
     ltr = ltr + message
     bin_ltr = ""
     seq = None
+    success = True
 
     # Pass "wb" to write a new file, or "ab" to append
     with open(directory+outfile, "wb") as binary_file:
 
         # Pass "wb" to write a new file, or "ab" to append
         with open(directory+infile, "rb") as wav_file:
+        
             # Write text or bytes to the file
             data = bytearray(wav_file.read())
-            if (sign==acak_sign or sign==acak_enc):
-                seeder = 0
-                for c in key:
-                    seeder = (seeder + ord(c))%seeder_limit
 
-                starting_point = offset+len(acak_sign)*8+len(delimiter)
-                seq = generateIndexRandom(message, seeder, starting_point, len(data))
-                
-            if (sign==acak_sign or sign==acak_enc):
-                if (sign==acak_enc):
-                    bin_ltr = bin.text_to_bits(acak_enc) + delimiter
-                else:
-                    bin_ltr = bin.text_to_bits(acak_sign) + delimiter
-                #bin_ltr = bin_ltr + bin.text_to_bits(str(seeder)) + delimiter
+            starting_point = offset+len(acak_sign)*8+len(delimiter)
+
+            if (len(message)>(len(data)-starting_point)):
+                success = False
             else:
-                if (sign==seq_sign):
-                    bin_ltr = bin.text_to_bits(seq_sign) + delimiter
+                if (sign==acak_sign or sign==acak_enc):
+                    seeder = 0
+                    for c in key:
+                        seeder = (seeder + ord(c))%seeder_limit
+
+                    seq = generateIndexRandom(message, seeder, starting_point, len(data))
+                    
+                if (sign==acak_sign or sign==acak_enc):
+                    if (sign==acak_enc):
+                        bin_ltr = bin.text_to_bits(acak_enc) + delimiter
+                    else:
+                        bin_ltr = bin.text_to_bits(acak_sign) + delimiter
+                    #bin_ltr = bin_ltr + bin.text_to_bits(str(seeder)) + delimiter
                 else:
-                    bin_ltr = bin.text_to_bits(seq_enc) + delimiter
-            bin_ltr = bin_ltr + bin.text_to_bits(ltr) + delimiter
+                    if (sign==seq_sign):
+                        bin_ltr = bin.text_to_bits(seq_sign) + delimiter
+                    else:
+                        bin_ltr = bin.text_to_bits(seq_enc) + delimiter
+                bin_ltr = bin_ltr + bin.text_to_bits(ltr) + delimiter
 
-            if (sign==acak_sign or sign==acak_enc):
-                for i in range(offset, starting_point):
-                    data[i] = bin.setLSB(data[i], int(bin_ltr[i-offset]))
-                
-                for i in range(0,len(seq)):
-                    data[seq[i]] = bin.setLSB(data[seq[i]], int(bin_ltr[starting_point-offset+i]))
-                
-            else:
-                for i in range(0,len(bin_ltr)):
-                    idx = offset+i
-                    data[idx] = bin.setLSB(data[idx], int(bin_ltr[i])) 
+                if (sign==acak_sign or sign==acak_enc):
+                    for i in range(offset, starting_point):
+                        data[i] = bin.setLSB(data[i], int(bin_ltr[i-offset]))
+                    
+                    for i in range(0,len(seq)):
+                        data[seq[i]] = bin.setLSB(data[seq[i]], int(bin_ltr[starting_point-offset+i]))
+                    
+                else:
+                    for i in range(0,len(bin_ltr)):
+                        idx = offset+i
+                        data[idx] = bin.setLSB(data[idx], int(bin_ltr[i])) 
 
-            binary_file.write(data)
+                binary_file.write(data)
+    
+    return success
 
 def extract(filename, key):
 

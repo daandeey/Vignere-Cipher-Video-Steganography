@@ -116,13 +116,18 @@ if __name__ == "__main__":
                                 key = input()
                             print("Simpan hasil ke file: ", end='')
                             out = input()
-                            aud.embed(fileaudio, out, sign, pesan, key)
-                            print("Penyisipan pesan berhasil!!!")
-                            print("Mainkan hasil steganografi? (y/n): ", end='')
-                            choice = input()
-                            if (choice=="y"):
-                                clear_screen()
-                                play_audio(out)
+                            success = aud.embed(fileaudio, out, sign, pesan, key)
+                            if (success):
+                                print("Penyisipan pesan berhasil!!!")
+                                print("Mainkan hasil steganografi? (y/n): ", end='')
+                                choice = input()
+                                if (choice=="y"):
+                                    clear_screen()
+                                    play_audio(out)
+                                    print("\nTekan apapun untuk lanjut...", end='')
+                                    choice = input()
+                            else:
+                                print("Ukuran file audio tidak mencukupi!!!")
                                 print("\nTekan apapun untuk lanjut...", end='')
                                 choice = input()
                         elif (choice=="2"):
@@ -141,14 +146,18 @@ if __name__ == "__main__":
                                 pesan = cp.VigenereCipherExtendedEncrypt(key, pesan)
                             print("Simpan hasil ke file: ", end='')
                             out = input()
-                            aud.embed(fileaudio, out, sign, pesan, key)
-                            print("Penyisipan pesan berhasil!!!")
-                            print("Mainkan hasil steganografi? (y/n): ", end='')
-                            choice = input()
-                    
-                            if (choice=="y"):
-                                clear_screen()
-                                play_audio(out)
+                            success = aud.embed(fileaudio, out, sign, pesan, key)
+                            if (success):
+                                print("Penyisipan pesan berhasil!!!")
+                                print("Mainkan hasil steganografi? (y/n): ", end='')
+                                choice = input()
+                                if (choice=="y"):
+                                    clear_screen()
+                                    play_audio(out)
+                                    print("\nTekan apapun untuk lanjut...", end='')
+                                    choice = input()
+                            else:
+                                print("Ukuran file audio tidak mencukupi!!!")
                                 print("\nTekan apapun untuk lanjut...", end='')
                                 choice = input()
                         elif(choice=="6"):
