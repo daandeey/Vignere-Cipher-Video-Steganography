@@ -46,7 +46,7 @@ def embed_audio_menu(fileaudio, filepesan):
     print("4: Ganti file audio")
     print("5: Ganti file pesan")
     print("6: Kembali")
-    print("Pilih (1/2/3/4): ", end='')
+    print("Pilih (1/2/3/4/5/6): ", end='')
 
 def extract_audio_menu(fileaudio):
     print("==========================================")
@@ -58,7 +58,7 @@ def extract_audio_menu(fileaudio):
     print("3: Ekstraksi pesan langsung")
     print("4: Ganti file audio")
     print("5: Kembali")
-    print("Pilih (1/2/3/4): ", end='')
+    print("Pilih (1/2/3/4/5): ", end='')
 
 def play_audio(fileaudio):
     player = vlc.MediaPlayer(audio_dir+fileaudio)
@@ -119,9 +119,9 @@ if __name__ == "__main__":
                             aud.embed(fileaudio, out, sign, pesan, key)
                             print("Penyisipan pesan berhasil!!!")
                             print("Mainkan hasil steganografi? (y/n): ", end='')
-                            clear_screen()
                             choice = input()
                             if (choice=="y"):
+                                clear_screen()
                                 play_audio(out)
                                 print("\nTekan apapun untuk lanjut...", end='')
                                 choice = input()
