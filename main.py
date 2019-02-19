@@ -33,7 +33,7 @@ if (choice=="1"):
 
         print("========================================")
         print("File audio: ", fileaudio)
-        print("File pesan: ", pesan)
+        print("File pesan: ", filepesan)
         print("1: Mainkan file audio")
         print("2: Penyisipan pesan terurut")
         print("3: Penyisipan pesan secara acak")
@@ -90,14 +90,30 @@ elif (choice=="2"):
     print("4: Kembali")
     print("Pilih (1/2/3/4): ", end='')
     choice = input()
-    
-    if (choice=="3"):
+
+    if (choice=="2" or choice=="3"):
         print("Apakah memerlukan kunci? (y/n): ", end='')
-        choice = input()
-        key = ""
-        if (choice=="y"):
+        confirm = input()
+        key = None
+        if (confirm=="y"):
             print("Masukkan kunci: ", end='')
             key = input()
+    
+    filepesan = ""
+    if (choice=="2"):
+        print("Simpan pesan pada file: ", end="")
+        filepesan = input()
+
+    if (choice=="2" or choice=="3"):
         hasil = aud.extract(fileaudio, key)
-        print("Ekstraksi pesan berhasil!!!")
-        print(hasil)
+        
+        if (choice=="3"):
+            print("Ekstraksi pesan berhasil!!!")
+            print("Pesan: ")
+            print(hasil)
+        else:
+            writing = open(directory+filepesan, "w")
+            writing.write(hasil)
+            writing.close() 
+            print("Ekstraksi pesan berhasil disimpan di "+filepesan+"!!!")
+        

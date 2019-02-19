@@ -16,13 +16,28 @@ directory = "wav/"
 def generateIndexRandom(message, seeder, start, limit):
     
     index_list = []
+    used = []
+    for i in range(0, limit+1):
+        used.append(False)
+
     random.seed(seeder)
     for c in bin.text_to_bits(message):
-        #for k in range(0, 8):
-        index_list.append(random.randint(start, limit))
+        hasil = None
+        while True:
+            hasil = random.randint(start, limit)
+            if (not used[hasil]):
+                used[hasil] = True
+                break
+        index_list.append(hasil)
 
     for k in range(0, 8):
-        index_list.append(random.randint(start, limit))
+        hasil = None
+        while True:
+            hasil = random.randint(start, limit)
+            if (not used[hasil]):
+                used[hasil] = True
+                break
+        index_list.append(hasil)
     
     return index_list
 
@@ -59,7 +74,6 @@ def embed(infile, outfile, sign, message):
                     bin_ltr = bin.text_to_bits(seq_sign) + delimiter
                 else:
                     bin_ltr = bin.text_to_bits(seq_enc) + delimiter
-            #print(ltr)
             bin_ltr = bin_ltr + bin.text_to_bits(ltr) + delimiter
 
             if (sign==acak_sign or sign==acak_enc):
@@ -128,17 +142,23 @@ def extract(filename, key):
                 idx = idx + 1
                 timer = timer + 1
                 count = count + 1
-                if (timer==50):
-                    break
-    
+            
             seeder = int(bin.text_from_bits(take[0:idx]))
             random.seed(seeder)
             found = False
             count = 1
             turn = 0
             message = ""
+            used = []
+            for i in range(0, len(data)+1):
+                used.append(False)
             while not found:
-                index = random.randint(offset+(len(acak_sign)+len(str(seeder)))*8+2*len(delimiter), len(data))
+                index = None
+                while True:
+                    index = random.randint(offset+(len(acak_sign)+len(str(seeder)))*8+2*len(delimiter), len(data))
+                    if (not used[index]):
+                        used[index] = True
+                        break
                 message = message + str(data[index] & 1)
                 if (count == 8):
                     count = 0
@@ -146,11 +166,9 @@ def extract(filename, key):
                         found = True
                     turn = turn + 1
                 count = count + 1
-            #
+            
             hasil = bin.text_from_bits(message[0:8*(turn-1)])
-            #print(sign)
             if (sign == acak_enc):
-                #print(sign)
                 hasil = cp.VigenereCipherExtendedDecrypt(key, hasil) 
             return hasil
 
