@@ -6,6 +6,7 @@ import pyaudio
 import wave
 import sys
 import vlc
+import time
 
 directory = "text/"
 audio_dir = "wav/"
@@ -50,6 +51,7 @@ if (choice=="1"):
         if (choice=="1"):
             player = vlc.MediaPlayer(audio_dir+fileaudio)
             player.play()
+            time.sleep(10)
             '''
             #print(audio_dir+fileaudio)
             sound = wave.open("cat-purr.wav")
@@ -71,16 +73,21 @@ if (choice=="1"):
             print("Apakah perlu dienkripsi? (y/n): ", end='')
             choice = input()
             key = None
+            sign = aud.acak_sign
             if (choice=='y'):
-                print("Masukkan kunci: ", end='')
+                print("Masukkan kunci untuk enkripsi dan pengacakan: ", end='')
                 key = input()
                 pesan = cp.VigenereCipherExtendedEncrypt(key, pesan)
+                sign = aud.acak_enc
+            else:
+                print("Masukkan kunci untuk pengacakan: ", end='')
+                key = input()
             print("Simpan hasil ke file: ", end='')
             out = input()
-            aud.embed(fileaudio, out, aud.acak_sign, pesan)
+            aud.embed(fileaudio, out, sign, pesan, key)
             print("Penyisipan pesan berhasil!!!")
             print("Mainkan hasil steganografi? (y/n): ")
-            print(aud.extract(out, key))
+            #print(aud.extract(out, key))
         elif (choice=="2"):
             print("========================================")
             print("Penyisipan pesan ke audio terurut")
@@ -90,7 +97,7 @@ if (choice=="1"):
             key = None
             if (choice=='y'):
                 sign = aud.seq_enc
-                print("Masukkan kunci: ", end='')
+                print("Masukkan kunci untuk enkripsi: ", end='')
                 key = input()
                 pesan = cp.VigenereCipherExtendedEncrypt(key, pesan)
             print("Simpan hasil ke file: ", end='')

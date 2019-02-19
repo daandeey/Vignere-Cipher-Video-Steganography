@@ -41,7 +41,7 @@ def generateIndexRandom(message, seeder, start, limit):
     
     return index_list
 
-def embed(infile, outfile, sign, message):
+def embed(infile, outfile, sign, message, key):
 
     ltr = ""
     ltr = ltr + message
@@ -57,18 +57,18 @@ def embed(infile, outfile, sign, message):
             data = bytearray(wav_file.read())
             if (sign==acak_sign or sign==acak_enc):
                 seeder = 0
-                for c in message:
+                for c in key:
                     seeder = (seeder + ord(c))%seeder_limit
 
-                starting_point = offset+(len(acak_sign)+len(str(seeder)))*8+2*len(delimiter)
+                starting_point = offset+len(acak_sign)*8+len(delimiter)
                 seq = generateIndexRandom(message, seeder, starting_point, len(data))
                 
             if (sign==acak_sign or sign==acak_enc):
-                if (acak_enc):
+                if (sign==acak_enc):
                     bin_ltr = bin.text_to_bits(acak_enc) + delimiter
                 else:
                     bin_ltr = bin.text_to_bits(acak_sign) + delimiter
-                bin_ltr = bin_ltr + bin.text_to_bits(str(seeder)) + delimiter
+                #bin_ltr = bin_ltr + bin.text_to_bits(str(seeder)) + delimiter
             else:
                 if (sign==seq_sign):
                     bin_ltr = bin.text_to_bits(seq_sign) + delimiter
@@ -126,6 +126,7 @@ def extract(filename, key):
                 hasil = cp.VigenereCipherExtendedDecrypt(key, hasil)
             return hasil
         else:
+            '''
             idx = len(acak_sign)*8+len(delimiter)+offset
             count = 1
             timer = 0
@@ -142,8 +143,11 @@ def extract(filename, key):
                 idx = idx + 1
                 timer = timer + 1
                 count = count + 1
-            
-            seeder = int(bin.text_from_bits(take[0:idx]))
+            '''
+            seeder = 0
+            for c in key:
+                seeder = (seeder + ord(c))%seeder_limit
+            #seeder = int(bin.text_from_bits(take[0:idx]))
             random.seed(seeder)
             found = False
             count = 1
@@ -155,7 +159,7 @@ def extract(filename, key):
             while not found:
                 index = None
                 while True:
-                    index = random.randint(offset+(len(acak_sign)+len(str(seeder)))*8+2*len(delimiter), len(data))
+                    index = random.randint(offset+len(acak_sign)*8+len(delimiter), len(data))
                     if (not used[index]):
                         used[index] = True
                         break
