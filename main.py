@@ -2,7 +2,13 @@ from audio import steganography as aud
 from audio import binary as bin
 from cipher import cipher as cp
 
+import pyaudio  
+import wave
+import sys
+import vlc
+
 directory = "text/"
+audio_dir = "wav/"
 
 print("========================================")
 print("Aplikasi Steganografi")
@@ -41,7 +47,25 @@ if (choice=="1"):
         print("Pilih (1/2/3/4): ", end='')
         choice = input()
 
-        if (choice=="3"):
+        if (choice=="1"):
+            player = vlc.MediaPlayer(audio_dir+fileaudio)
+            player.play()
+            '''
+            #print(audio_dir+fileaudio)
+            sound = wave.open("cat-purr.wav")
+            p = pyaudio.PyAudio()
+            chunk = 1024
+            stream = p.open(format =
+                        p.get_format_from_width(wf.getsampwidth()),
+                        channels = wf.getnchannels(),
+                        rate = wf.getframerate(),
+                        output = True)
+            data = wf.readframes(chunk)
+            while data != '':
+                stream.write(data)
+                data = wf.readframes(chunk)
+            '''
+        elif (choice=="3"):
             print("========================================")
             print("Penyisipan pesan ke audio secara acak")
             print("Apakah perlu dienkripsi? (y/n): ", end='')
