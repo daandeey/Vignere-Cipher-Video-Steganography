@@ -160,6 +160,12 @@ if __name__ == "__main__":
                                 print("Ukuran file audio tidak mencukupi!!!")
                                 print("\nTekan apapun untuk lanjut...", end='')
                                 choice = input()
+                        elif (choice=="5"):
+                            print("Masukkan file pesan: ", end='')
+                            filepesan = input()
+                        elif (choice=="4"):
+                            print("Masukkan file audio: ", end='')
+                            fileaudio = input()
                         elif(choice=="6"):
                             finished = True
 
@@ -212,7 +218,10 @@ if __name__ == "__main__":
                         writing.write(hasil)
                         writing.close() 
                         print("Ekstraksi pesan berhasil disimpan di "+filepesan+"!!!")
-                
+
+                if (choice=="4"):
+                    print("Masukkan file audio: ", end='')
+                    fileaudio = input()
                 if (choice=="5"):
                     finished = True
             finished = False
